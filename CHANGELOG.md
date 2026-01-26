@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未发布]
 
+### 新增
+
+- 适配LeviLamina 1.9.2
+- 玩家骑鹦鹉螺移动距离
+
 ## [0.6.0] - 2025-11-06
 
 ### 新增
