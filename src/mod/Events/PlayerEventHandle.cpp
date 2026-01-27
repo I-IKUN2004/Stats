@@ -8,6 +8,7 @@
 #include <mc/network/packet/PlayerAuthInputPacket.h>
 #include <mc/world/actor/ActorType.h>
 #include <mc/world/attribute/AttributeInstance.h>
+#include <mc/world/attribute/AttributeInstanceConstRef.h>
 #include <mc/world/attribute/AttributeModificationContext.h>
 #include <mc/world/attribute/MutableAttributeWithContext.h>
 #include <mc/world/attribute/SharedAttributes.h>
@@ -112,7 +113,10 @@ void onStopRiding(mce::UUID uuid, Actor* vehicle) {
         playerStats->addCustomStats(CustomType::strider_one_cm, value);
     } else if (vehicle->isType(ActorType::HappyGhast)) {
         playerStats->addCustomStats(CustomType::happy_ghast_one_cm, value);
+    } else if (vehicle->isType(::ActorType::Nautilus)) {
+        playerStats->addCustomStats(CustomType::nautilus_one_cm, value);
     }
+    playerStats->mDistanceCache.ride = 0;
 }
 
 void onAuthInput(ServerPlayer& player, PlayerAuthInputPacket const& packet) {
@@ -131,7 +135,7 @@ void onAuthInput(ServerPlayer& player, PlayerAuthInputPacket const& packet) {
     // packet.mPosDelta
 
     if (player.isRiding()) {
-        auto value = static_cast<uint64_t>(std::round(player.getPosition().distanceTo(playerStats->mLastPos) * 100));
+        auto value = static_cast<uint64_t>(std::floor(player.getPosition().distanceTo(playerStats->mLastPos) * 100));
         playerStats->mDistanceCache.ride += value;
         playerStats->mLastPos             = pos;
     } else {
@@ -235,8 +239,8 @@ void onTakenDamage(Player* player, float damage, float afterDamage) {
     auto playerStats = findPlayer->second;
     if (!playerStats) return;
 
-    auto  heath          = player->getMutableAttribute(SharedAttributes::HEALTH()).mInstance->mCurrentValue;
-    auto  absorption     = player->getMutableAttribute(SharedAttributes::ABSORPTION()).mInstance->mCurrentValue;
+    auto  heath          = player->getHealth();
+    auto  absorption     = player->getAttribute(SharedAttributes::ABSORPTION()).mPtr->mCurrentValue;
     float damage_taken   = afterDamage > 0 ? afterDamage : -afterDamage;
     float damage_absobed = 0;
     if (absorption > 0) {
@@ -263,8 +267,8 @@ void onDealtDamage(Mob* mob, Player* player, float damage, float afterDamage) {
     auto playerStats = findPlayer->second;
     if (!playerStats) return;
 
-    auto  heath          = mob->getMutableAttribute(SharedAttributes::HEALTH()).mInstance->mCurrentValue;
-    auto  absorption     = mob->getMutableAttribute(SharedAttributes::ABSORPTION()).mInstance->mCurrentValue;
+    auto  heath          = mob->getHealth();
+    auto  absorption     = mob->getAttribute(SharedAttributes::ABSORPTION()).mPtr->mCurrentValue;
     float damage_taken   = afterDamage > 0 ? afterDamage : -afterDamage;
     float damage_absobed = 0;
     if (absorption > 0) {
@@ -342,11 +346,6 @@ void onUsedItem(Player* player, ItemStackBase& instance, ItemUseMethod itemUseMe
         break;
     case ItemUseMethod::Place:
         playerStats->addStats(StatsType::used, instance.getTypeName());
-        // 暂时先用ID, 装addon不知道会不会有问题？
-        // if (auto id = instance.getId();
-        //     (id >= 567 && id <= 578) || id == 657 || id == 663 || id == 673 || id == 736 || (id >= 782 && id <= 784))
-        //     { playerStats->addCustomStats(CustomType::play_record);
-        // }
         if (instance.getItem()->isMusicDisk()) {
             playerStats->addCustomStats(CustomType::play_record);
         }

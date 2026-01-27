@@ -34,7 +34,7 @@ struct StatsRank {
 };
 
 void registerCommand() {
-    auto& cmd = ll::command::CommandRegistrar::getInstance()
+    auto& cmd = ll::command::CommandRegistrar::getInstance(false)
                     .getOrCreateCommand(
                         "command.stats.name"_tr(),
                         "LK-Stats - " + "command.stats.desc"_tr(),

@@ -2,12 +2,13 @@
 
 #include <ll/api/memory/Hook.h>
 #include <ll/api/memory/Memory.h>
-#include <mc/world/actor/player/Player.h>
 #include <mc/deps/ecs/WeakEntityRef.h>
 #include <mc/deps/shared_types/legacy/ContainerType.h>
 #include <mc/world/SimpleSparseContainer.h>
+#include <mc/world/actor/player/Player.h>
 #include <mc/world/containers/FullContainerName.h>
 #include <mc/world/inventory/network/ContainerScreenContext.h>
+#include <mc/world/inventory/network/ItemStackNetManagerServer.h>
 #include <mc/world/inventory/network/ItemStackNetResult.h>
 #include <mc/world/inventory/network/ItemStackRequestActionHandler.h>
 #include <mc/world/inventory/network/ItemStackRequestActionTransferBase.h>
@@ -15,6 +16,7 @@
 #include <mc/world/item/ItemStackBase.h>
 #include <mc/world/level/block/Block.h>
 #include <mc/world/level/block/actor/BlockActor.h>
+
 
 #include "mod/Events/PlayerEventHandle.h"
 
@@ -38,10 +40,10 @@ LL_TYPE_INSTANCE_HOOK(
     ::std::shared_ptr<::SimpleSparseContainer> srcContainer = _getOrInitSparseContainer(src.mFullContainerName);
     if (!srcContainer) return origin(requestAction, isSwap, isSrcHintSlot, isDstHintSlot);
     auto const& srcItem    = srcContainer->getItem(src.mSlot);
-    auto&       screenCtx  = getScreenContext();
+    auto& screenCtx  = mItemStackNetManager.getScreenContext();
     auto        screenType = screenCtx.mScreenContainerType;
     auto        itemType   = srcItem.getTypeName();
-    auto r = origin(requestAction, isSwap, isSrcHintSlot, isDstHintSlot);
+    auto        r          = origin(requestAction, isSwap, isSrcHintSlot, isDstHintSlot);
     if (r != ItemStackNetResult::Success) return r;
     event::player::onCraftedItem(mPlayer.getUuid(), itemType, requestAction.mAmount, screenType);
     return r;
