@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未发布]
 
+### 修复
+
+- 修复长矛-损坏的统计项异常
+
 ## [0.7.0] - 2026-01-27
 
 ### 新增
