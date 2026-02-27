@@ -318,7 +318,7 @@ void onItemHurtAndBroken(Player* player, ItemStackBase* item, int deltaDamage) {
     if (!playerStats) return;
     if (!item->isDamageableItem()) return;
     if (!item->isArmorItem()) playerStats->addStats(StatsType::used, item->getTypeName());
-    auto maxDamage = item->mItem->mMaxDamage;
+    auto maxDamage = item->getMaxDamage();
     auto damage    = item->getDamageValue();
     if (damage + deltaDamage > maxDamage) {
         playerStats->addStats(StatsType::broken, item->getTypeName());
