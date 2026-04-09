@@ -6,7 +6,6 @@
 #include <mc/deps/nbt/CompoundTag.h>
 #include <mc/world/actor/player/Player.h>
 #include <mc/world/level/block/Block.h>
-#include <mc/world/level/block/BlockLegacy.h> // <--- 重点：新增了 BlockLegacy 的头文件
 #include <mc/world/level/block/CachedComponentData.h>
 #include <mc/world/level/block/components/BlockComponentDirectData.h>
 #include <mc/world/level/block/components/BlockComponentStorage.h>
@@ -14,13 +13,11 @@
 #include "mod/Events/BlockEventHandle.h"
 
 namespace stats::hook::block {
-
-// 把 Block 改为了 BlockLegacy
 LL_TYPE_INSTANCE_HOOK(
     BlockUseHook,
     HookPriority::Normal,
-    ::BlockLegacy,
-    &BlockLegacy::use,
+    ::Block,
+    &Block::use,
     bool,
     ::Player&               player,
     ::BlockPos const&       pos,
@@ -33,19 +30,17 @@ LL_TYPE_INSTANCE_HOOK(
     return r;
 }
 
-// 同样把 Block 改为了 BlockLegacy
 LL_TYPE_INSTANCE_HOOK(
     BlockOnFallOnHook,
     HookPriority::Normal,
-    ::BlockLegacy,
-    &BlockLegacy::onFallOn,
+    ::Block,
+    &Block::onFallOn,
     void,
     ::BlockSource&    region,
     ::BlockPos const& pos,
     ::Actor&          entity,
     float             fallDistance
 ) {
-    
     if (fallDistance < 1.0f) return origin(region, pos, entity, fallDistance);
     event::block::onFallOn(entity, fallDistance);
     return origin(region, pos, entity, fallDistance);
