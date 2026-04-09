@@ -7,7 +7,6 @@
 #include <mc/legacy/ActorUniqueID.h>
 #include <mc/network/packet/PlayerAuthInputPacket.h>
 #include <mc/world/actor/ActorType.h>
-#include <mc/world/actor/ActorFlags.h>
 #include <mc/world/attribute/AttributeInstance.h>
 #include <mc/world/attribute/AttributeInstanceConstRef.h>
 #include <mc/world/attribute/AttributeModificationContext.h>
@@ -139,12 +138,10 @@ void onAuthInput(ServerPlayer& player, PlayerAuthInputPacket const& packet) {
     } else {
         playerStats->mDistanceCache.ride = 0;
 
-        if (player.getStatusFlag(ActorFlags::InWater)) { 
+        if (player.isSwimming() || player._isHeadInWater()) { 
             auto value = static_cast<uint64_t>(std::floor(packet.mPosDelta->length() * 100));
             if (player.isSwimming()) {
                 playerStats->addCustomStats(CustomType::swim_one_cm, value);
-            } else if (player._isHeadInWater()) {
-                playerStats->addCustomStats(CustomType::walk_on_water_one_cm, value);
             } else {
                 playerStats->addCustomStats(CustomType::walk_under_water_one_cm, value);
             }
