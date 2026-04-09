@@ -6,6 +6,7 @@
 #include <mc/deps/nbt/CompoundTag.h>
 #include <mc/world/actor/player/Player.h>
 #include <mc/world/level/block/Block.h>
+#include <mc/world/level/block/BlockLegacy.h> // <--- 重点：新增了 BlockLegacy 的头文件
 #include <mc/world/level/block/CachedComponentData.h>
 #include <mc/world/level/block/components/BlockComponentDirectData.h>
 #include <mc/world/level/block/components/BlockComponentStorage.h>
@@ -13,11 +14,13 @@
 #include "mod/Events/BlockEventHandle.h"
 
 namespace stats::hook::block {
+
+// 把 Block 改为了 BlockLegacy
 LL_TYPE_INSTANCE_HOOK(
     BlockUseHook,
     HookPriority::Normal,
-    ::Block,
-    &Block::use,
+    ::BlockLegacy,
+    &BlockLegacy::use,
     bool,
     ::Player&               player,
     ::BlockPos const&       pos,
@@ -30,11 +33,12 @@ LL_TYPE_INSTANCE_HOOK(
     return r;
 }
 
+// 同样把 Block 改为了 BlockLegacy
 LL_TYPE_INSTANCE_HOOK(
     BlockOnFallOnHook,
     HookPriority::Normal,
-    Block,
-    &Block::onFallOn,
+    ::BlockLegacy,
+    &BlockLegacy::onFallOn,
     void,
     ::BlockSource&    region,
     ::BlockPos const& pos,
